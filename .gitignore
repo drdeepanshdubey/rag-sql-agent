@@ -1,0 +1,40 @@
+# ── Secrets ──
+.env
+.env.local
+*.key
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+ENV/
+
+# ── App state / generated ──
+vector_store_db/
+*.duckdb
+*.db
+.streamlit/secrets.toml
+
+# ── Caches ──
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+huggingface/
+sentence_transformers_cache/
+
+# ── OS / editor ──
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
