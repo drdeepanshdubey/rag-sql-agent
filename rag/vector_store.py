@@ -28,12 +28,17 @@ class SchemaVectorStore:
         return self._embedder
 
     def _get_client(self) -> chromadb.Client:
-        """Lazy-init ChromaDB client."""
+        """Lazy-init ChromaDB client. Clears stale data from previous sessions."""
         if self._client is None:
             self._client = chromadb.PersistentClient(
                 path=self.persist_dir,
                 settings=ChromaSettings(anonymized_telemetry=False)
             )
+            # Clear stale schemas from previous sessions to prevent data leak
+            try:
+                self._client.delete_collection(self.COLLECTION_NAME)
+            except Exception:
+                pass
         return self._client
 
     def _get_collection(self) -> chromadb.Collection:

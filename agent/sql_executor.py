@@ -38,7 +38,7 @@ class SQLExecutor:
         # We store a reference and register it
         if table_name in self._registered_tables:
             try:
-                self._conn.execute(f'DROP VIEW IF EXISTS "{table_name}"')
+                self._conn.unregister(table_name)
             except Exception:
                 pass
 
@@ -75,6 +75,14 @@ class SQLExecutor:
         was_repaired = False
 
         for attempt in range(1, max_retries + 1):
+            # Step 0: Safety check — block destructive SQL
+            if not SQLValidator.is_safe(sql):
+                return ExecutionResult(
+                    success=False, data=None, sql_used=sql,
+                    error_message="Query blocked: contains potentially destructive operations (DROP, DELETE, INSERT, etc.)",
+                    attempts=attempt, rows_returned=0, was_repaired=was_repaired,
+                )
+
             # Step 1: Pre-validate SQL syntax
             validation_error = SQLValidator.validate(sql)
             if validation_error and attempt == 1:
@@ -124,7 +132,7 @@ class SQLExecutor:
             data=None,
             sql_used=sql,
             error_message=last_error,
-            attempts=max_retries,
+            attempts=attempt,
             rows_returned=0,
             was_repaired=was_repaired,
         )
@@ -138,11 +146,11 @@ class SQLExecutor:
             return str(list(self._registered_tables))
 
     def reset(self) -> None:
-        """Drop all registered tables and reset state."""
+        """Unregister all registered tables and reset state."""
         for table in list(self._registered_tables):
             try:
-                self._conn.execute(f'DROP VIEW IF EXISTS "{table}"')
+                self._conn.unregister(table)
             except Exception:
                 pass
         self._registered_tables.clear()
-        logger.info("DuckDB executor reset: all tables dropped")
+        logger.info("DuckDB executor reset: all tables unregistered")

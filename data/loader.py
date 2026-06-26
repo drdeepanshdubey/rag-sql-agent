@@ -27,6 +27,8 @@ class DataLoader:
         stem = Path(filename).stem.lower()
         # Sanitize table name: remove non-alphanumeric except underscore
         table_name = ''.join(c if c.isalnum() or c == '_' else '_' for c in stem)
+        if not table_name:
+            table_name = 'uploaded_table'
         if table_name[0].isdigit():
             table_name = 't_' + table_name
 
@@ -91,10 +93,12 @@ class DataLoader:
         xls = pd.ExcelFile(file_like, engine=engine)
         tables = {}
         for sheet_name in xls.sheet_names:
-            df = pd.read_excel(file_like, sheet_name=sheet_name, engine=engine)
+            df = xls.parse(sheet_name)
             df = cls._clean_dataframe(df)
             if len(df) > 0:  # Skip empty sheets
                 safe_name = ''.join(c if c.isalnum() or c == '_' else '_' for c in sheet_name.lower())
+                if not safe_name:
+                    safe_name = 'sheet'
                 if safe_name[0].isdigit():
                     safe_name = 't_' + safe_name
                 tables[safe_name] = df
@@ -123,8 +127,8 @@ class DataLoader:
             ''.join(c if c.isalnum() or c == '_' else '_' for c in str(col).strip().lower())
             for col in df.columns
         ]
-        # Ensure column names start with letter
-        df.columns = [f"col_{c}" if c[0].isdigit() else c for c in df.columns]
+        # Ensure column names are non-empty and start with letter
+        df.columns = [f"col_{i}" if not c else (f"col_{c}" if c[0].isdigit() else c) for i, c in enumerate(df.columns)]
         # Handle duplicate column names
         seen = {}
         new_cols = []

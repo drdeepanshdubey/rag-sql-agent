@@ -181,6 +181,14 @@ with st.sidebar:
                 with st.spinner("Loading and indexing data..."):
                     for uploaded_file in uploaded_files:
                         try:
+                            # Enforce file size limit
+                            file_size_mb = uploaded_file.size / (1024 * 1024)
+                            if file_size_mb > settings.max_file_size_mb:
+                                errors.append(
+                                    f"{uploaded_file.name}: File too large "
+                                    f"({file_size_mb:.1f} MB, max {settings.max_file_size_mb} MB)"
+                                )
+                                continue
                             tables = DataLoader.load_file(uploaded_file, uploaded_file.name)
                             for table_name, df in tables.items():
                                 schema_dict = agent.load_data(table_name, df)
@@ -403,7 +411,7 @@ if submitted and user_input.strip():
 
     # If model changed, update agent
     current_model = SessionState.get(SessionState.MODEL)
-    # (Agent is recreated on file load — model is set at that point)
+    agent.update_model(current_model)
 
     # Add user message
     SessionState.add_message("user", user_input)

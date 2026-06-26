@@ -52,8 +52,8 @@ class ResultFormatter:
                 fig = px.scatter(
                     df, x=numeric_cols[0], y=numeric_cols[1],
                     title=f"{numeric_cols[1]} vs {numeric_cols[0]}",
-                    template='plotly_dark', height=350
                 )
+                fig.update_layout(template='plotly_dark', height=350)
                 return fig
 
         except Exception:

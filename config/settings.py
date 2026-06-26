@@ -7,9 +7,6 @@ import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic import Field
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class Settings(BaseSettings):
     # OpenRouter
@@ -51,8 +48,8 @@ AVAILABLE_MODELS = {
     "GPT-4o (Best OpenAI)":             "openai/gpt-4o",
     "Claude 3.5 Sonnet (Best Anthropic)":"anthropic/claude-3.5-sonnet",
     "Claude 3 Haiku (Ultra Fast)":      "anthropic/claude-3-haiku",
-    "Gemini Flash 1.5":                 "google/gemini-flash-1.5",
-    "Gemini Pro 1.5":                   "google/gemini-pro-1.5",
+    "Gemini 1.5 Flash":                 "google/gemini-flash-1.5-8b",
+    "Gemini 1.5 Pro":                   "google/gemini-1.5-pro",
     "Llama 3.1 70B Instruct":           "meta-llama/llama-3.1-70b-instruct",
     "Qwen 2.5 72B Instruct":            "qwen/qwen-2.5-72b-instruct",
 }

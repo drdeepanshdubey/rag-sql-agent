@@ -83,6 +83,14 @@ class SQLAgent:
         self._tables.clear()
         logger.info("Agent reset: all data cleared")
 
+    def update_model(self, new_model: str) -> None:
+        """Update the LLM model used for SQL generation and interpretation."""
+        if new_model != self._model:
+            self._model = new_model
+            self._generator = SQLGenerator(api_key=self._api_key, model=new_model)
+            self._interpreter = ResultInterpreter(api_key=self._api_key, model=new_model)
+            logger.info(f"Agent model updated to: {new_model}")
+
     def get_loaded_tables(self) -> list[str]:
         """Return names of currently loaded tables."""
         return list(self._table_schemas.keys())
